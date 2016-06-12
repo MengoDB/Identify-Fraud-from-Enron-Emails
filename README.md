@@ -232,15 +232,15 @@ The whole dataset we have includes only 146 data points, which is very small. So
 
 ### Precision
 
-0.34
+0.39
 
-Precision, referred as positive predictive value, here indicated that 34% of people who are predicted as poi are truly people of interests.
+Precision, referred as positive predictive value, here indicated that 39% of people who are predicted as poi are truly people of interests.
 
 ### Recall
 
-0.32
+0.34
 
-Recall, referred as true positive rate or sensitivity, here indicated that among people of interests, 32% of them are correctly predicted via our final algorithm.
+Recall, referred as true positive rate or sensitivity, here indicated that among people of interests, 34% of them are correctly predicted via our final algorithm.
 
 
 
