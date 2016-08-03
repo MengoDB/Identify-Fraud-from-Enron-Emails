@@ -41,13 +41,18 @@ def AddFeature(dataset):
         data_point["fraction_to_poi"] = fraction_to_poi
     return dataset
 
+def print_importance( feature, imp):
+    for i in range(len(feature)-1):
+        print feature[i+1], ': ', imp[i]
+
 
 def decisionTree(feature_list, dataset):
     from sklearn import tree
 
     clf = tree.DecisionTreeClassifier()
     test_classifier(clf, dataset, feature_list)
-    print clf.feature_importances_
+    imp= clf.feature_importances_
+    print_importance (feature_list,imp)
     return clf
 
 def KNN(feature_list, dataset):
@@ -66,7 +71,6 @@ def GaussianNB(feature_list, dataset):
 
     clf = GaussianNB()
     test_classifier(clf, dataset, feature_list)
-    #score = clf.
     return clf
 
 
@@ -74,6 +78,8 @@ def RandomForest(feature_list,dataset):
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier()
     test_classifier(clf,dataset,feature_list)
+    imp= clf.feature_importances_
+    print_importance (feature_list,imp)
     return clf
 
 def tuneDT(feature_list, dataset):
@@ -91,6 +97,8 @@ def tuneDT(feature_list, dataset):
     print '###best_params'
     print clf.best_params_
     test_classifier(clf.best_estimator_,dataset,feature_list)
+    imp= clf.best_estimator_.feature_importances_
+    print_importance (feature_list,imp)
     return clf.best_estimator_
 
 def tuneKNN(feature_list, dataset):
@@ -161,12 +169,36 @@ with open("final_project_dataset.pkl", "r") as data_file:
     data = featureFormat(my_dataset, features_list, sort_keys=True)
     labels, features = targetFeatureSplit(data)
 
+    ### Count Missing values for each feature
 
+def selection_feature(features_list_all):
+    clf = decisionTree(features_list_all,my_dataset)
+    cont=1
+    feature_final=features_list_all
+    while cont==1:
+        cont=0
+        imp=clf.feature_importances_
+        feature_new=['poi']
+        for i in range(len(feature_final)-1):
+            if imp[i]==0:
+                cont=1
+            else:
+                feature_new.append(feature_final[i+1])
+        feature_final=feature_new
+        if cont ==1:
+            clf = decisionTree(feature_final,my_dataset)
+    return feature_final, clf
 
 
 ### Task 4: Try a varity of classifiers
 if __name__ == '__main__':
-    clf0 = decisionTree(features_list_all,my_dataset)
+    ### clf0 = decisionTree(features_list_all,my_dataset)
+    #features_list, clf1=selection_feature(features_list_all)
+
+    #print '\n selected features: ', features_list
+    ### clf1 = decisionTree(features_list,my_dataset)
+    features_list=['poi', 'total_payments', 'total_stock_value', 'expenses', 'exercised_stock_options',
+                   'restricted_stock', 'shared_receipt_with_poi', 'fraction_to_poi']
     clf1 = decisionTree(features_list,my_dataset)
     clf1_1 = tuneDT(features_list,my_dataset)
     clf2 = GaussianNB(features_list,my_dataset)
@@ -183,7 +215,8 @@ if __name__ == '__main__':
     print '###final algorithm is:'
     final_clf = clf1_1
     print final_clf
-    print final_clf.feature_importances_
+    imp_final=final_clf.feature_importances_
+    print_importance(features_list, imp_final)
     dump_classifier_and_data(final_clf, my_dataset, features_list)
 
 
